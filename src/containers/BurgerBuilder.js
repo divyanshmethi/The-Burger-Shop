@@ -3,6 +3,8 @@ import React, {Component} from 'react'
 import Auxillary from '../hoc/Auxillary'
 import Burger from '../../src/components/Burger/Burger'
 import BuildControls from '../../src/components/Burger/BuildControls/BuildControls'
+import Modal from '../components/UI/Modal/Modal'
+import OrderSummary from '../components/Burger/OrderSummary/OrderSummary'
 
 const PRICE = {
   salad: 5,
@@ -24,7 +26,8 @@ class BurgerBuilder extends Component
         meat: 0
       },
       totalPrice: 20,
-      purchasable: false
+      purchasable: false,
+      purchasing: false
     }
     this.addIngredientHandler = this.addIngredientHandler.bind(this)
     this.removeIngredientHandler = this.removeIngredientHandler.bind(this)
@@ -77,6 +80,23 @@ class BurgerBuilder extends Component
     })
   }
 
+  purchaseHandler = () =>
+  {
+    this.setState({
+      purchasing: true
+    })
+  }
+
+  purchaseCancelHandler = () => {
+    this.setState({
+      purchasing: false
+    })
+  }
+
+  purchaseContinueHandler = () => {
+    alert('You continue')
+  }
+
   render()
   {
     const disabledInfo = {
@@ -86,14 +106,25 @@ class BurgerBuilder extends Component
     {
       disabledInfo[key] = disabledInfo[key] <= 0
     }
-    return (<Auxillary>
+    return (
+    <Auxillary>
+      {this.state.purchasing && 
+      <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
+        <OrderSummary ingredients={ this.state.ingredients }
+         purchaseCancelled = {this.purchaseCancelHandler}
+         purchaseContinue = {this.purchaseContinueHandler}
+         totalPrice = {this.state.totalPrice} /> 
+      </Modal>
+      }
       <Burger ingredients = {this.state.ingredients} />
+      {/* Todo : Add Checkout button below our BuildControls */}
       <BuildControls 
       addIngredient = {this.addIngredientHandler} 
       removeIngredient = {this.removeIngredientHandler} 
       disabled = {disabledInfo}
       price = {this.state.totalPrice}
       purchasable = {this.state.purchasable}
+      ordered = {this.purchaseHandler}
       />
     </Auxillary>)
   }
